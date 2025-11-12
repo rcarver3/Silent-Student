@@ -25,7 +25,7 @@
             android:layout_height="wrap_content"
             android:backgroundTintMode="add"
             android:text="@string/permission_rationale"
-            android:textAlignment="textStart"
+            android:textAlignment="center"
             android:textAppearance="@style/TextAppearance.AppCompat.Large"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"

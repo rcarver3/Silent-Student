@@ -3,4 +3,5 @@
     <string name="permission_rationale">Silent Student needs permission to access the networks you are connected to and surrounded by.</string>
     <string name="grant_permissions">Grant Permissions</string>
     <string name="deny_permissions">Skip for now</string>
+    <string name="continue_dialog">Continue</string>
 </resources>

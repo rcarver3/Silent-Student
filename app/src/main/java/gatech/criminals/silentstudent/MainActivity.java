@@ -1,56 +1,48 @@
 package gatech.criminals.silentstudent;
 
 import android.Manifest;
+import android.app.Activity;
+import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 import android.widget.Toast;
 
+import androidx.activity.result.ActivityResultLauncher;
+import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 
 public class MainActivity extends AppCompatActivity {
-
+    public static final String GRANTED_EXTRA = "gatech.criminals.silentstudent.permissions_granted";
     // To identify MainActivity in LogCat
     private static final String MAIN_TAG = "MainActivity";
-    private static final String REQUEST_TAG = "RequestPermissionsActivity";
-    private static final int LOCATION_PERMISSION_REQUEST_CODE = 1;
-    private static final int LOCATION_PERMISSION_REPEAT_REQUEST_CODE = 2;
+    // private static final int LOCATION_PERMISSION_REQUEST_CODE = 1;
+    private static boolean userPermissionGranted = false;
+    private static boolean systemPermissionGranted = false;
+    // requestPermissionLauncher = registerForActivityResult(requestPermissionsActivity, onActivityResult);
+    static ActivityResultLauncher<String> requestPermissionLauncher;
+    static ActivityResultLauncher<Intent> permissionRationaleLauncher;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        Log.d(MAIN_TAG, "onCreate()");
-
-        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-            // TODO: Start activity requesting permission if system determines it
-            if (ActivityCompat.shouldShowRequestPermissionRationale(this, Manifest.permission.ACCESS_FINE_LOCATION)) {
-                Log.d(MAIN_TAG, "Showing permission request activity.");
-                setContentView(R.layout.activity_request_permissions);
-            } else {
-                requestAppPermissions(this, MAIN_TAG, LOCATION_PERMISSION_REQUEST_CODE);
+        Log.d(MAIN_TAG, "Starting main activity");
+        setContentView(R.layout.activity_main);
+        requestPermissionLauncher = registerForActivityResult(new ActivityResultContracts.RequestPermission(), granted -> systemPermissionGranted = granted);
+        permissionRationaleLauncher = registerForActivityResult(new ActivityResultContracts.StartActivityForResult(), activityResult -> {
+            if (activityResult.getResultCode() == Activity.RESULT_OK) {
+                Intent resultData = activityResult.getData();
+                if (resultData != null) {
+                    userPermissionGranted = activityResult.getData().getBooleanExtra(GRANTED_EXTRA, false);
+                }
             }
-        } else {
-            // Show main activity with WiFi details
-            Log.d(MAIN_TAG, "Has permissions, Showing main activity.");
-            setContentView(R.layout.activity_main);
-            displayWifiInfo();
-        }
-    }
+        });
 
-    public void onClickGrantPermission(View view) {
-        requestAppPermissions(this, REQUEST_TAG, LOCATION_PERMISSION_REPEAT_REQUEST_CODE);
     }
-
-    public void onClickDenyPermission(View view) {
-        Log.d(REQUEST_TAG, "Permission denied, giving up.");
-        Toast.makeText(this, "Location permission is required to use Silent Student.", Toast.LENGTH_LONG).show();
-        finish();
-    }
-
-    @Override
+                              /**
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
         if (requestCode == LOCATION_PERMISSION_REQUEST_CODE) {
@@ -75,23 +67,30 @@ public class MainActivity extends AppCompatActivity {
             }
         }
     }
+    */
 
-    private static void requestAppPermissions(AppCompatActivity activity, String tag, int requestCode) {
-        Log.d(tag, "Requesting permission now");
-        ActivityCompat.requestPermissions(activity, new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, requestCode);
+    public void onClickFinish(View view) {
+        Log.d(MAIN_TAG, "Checking permissions");
+        checkAndGetPermission();
     }
 
-    private void displayWifiInfo() {
-        WifiDetailsProvider wifiDetailsProvider = new WifiDetailsProvider(this);
-        WifiNetworkInfo wifiInfo = wifiDetailsProvider.getWifiDetails();
-
-        if (wifiInfo != null) {
-            Log.i(MAIN_TAG, "Connected to WiFi:");
-            Log.i(MAIN_TAG, wifiInfo.toString());
-            // You can also update UI elements here
-            // e.g., textView.setText(wifiInfo.toString());
+    private void checkAndGetPermission() {
+        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
+            Log.d(MAIN_TAG, "Has permissions, displaying wifi info.");
+            systemPermissionGranted = true;
         } else {
-            Log.w(MAIN_TAG, "Not connected to a WiFi network or cannot retrieve information.");
+            if (ActivityCompat.shouldShowRequestPermissionRationale(this, Manifest.permission.ACCESS_FINE_LOCATION)) {
+                Log.d(MAIN_TAG, "Showing rationale now");
+                permissionRationaleLauncher.launch(new Intent(this, RequestPermissionsActivity.class));
+            } else {
+                Log.d(MAIN_TAG, "asking for permissions");
+                requestPermissionLauncher.launch(Manifest.permission.ACCESS_FINE_LOCATION);
+            }
+        }
+        if (systemPermissionGranted) {
+            Toast.makeText(this, "You have network access!!", Toast.LENGTH_LONG).show();
+        } else {
+            Toast.makeText(this, "Location permission is required to use Silent Student.", Toast.LENGTH_LONG).show();
         }
     }
 }
