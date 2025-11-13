@@ -11,37 +11,10 @@ import android.widget.Toast;
 
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
-import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 
 public class MainActivity extends AppCompatActivity {
-    public static final String GRANTED_EXTRA = "gatech.criminals.silentstudent.permissions_granted";
-    // To identify MainActivity in LogCat
-    private static final String MAIN_TAG = "MainActivity";
-    // private static final int LOCATION_PERMISSION_REQUEST_CODE = 1;
-    private static boolean userPermissionGranted = false;
-    private static boolean systemPermissionGranted = false;
-    // requestPermissionLauncher = registerForActivityResult(requestPermissionsActivity, onActivityResult);
-    static ActivityResultLauncher<String> requestPermissionLauncher;
-    static ActivityResultLauncher<Intent> permissionRationaleLauncher;
-
-    @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        Log.d(MAIN_TAG, "Starting main activity");
-        setContentView(R.layout.activity_main);
-        requestPermissionLauncher = registerForActivityResult(new ActivityResultContracts.RequestPermission(), granted -> systemPermissionGranted = granted);
-        permissionRationaleLauncher = registerForActivityResult(new ActivityResultContracts.StartActivityForResult(), activityResult -> {
-            if (activityResult.getResultCode() == Activity.RESULT_OK) {
-                Intent resultData = activityResult.getData();
-                if (resultData != null) {
-                    userPermissionGranted = activityResult.getData().getBooleanExtra(GRANTED_EXTRA, false);
-                }
-            }
-        });
-
-    }
                               /**
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);

@@ -10,7 +10,7 @@ android {
 
     defaultConfig {
         applicationId = "gatech.criminals.silentstudent"
-        minSdk = 24
+        minSdk = 31
         targetSdk = 36
         versionCode = 1
         versionName = "1.0"
@@ -40,6 +40,9 @@ dependencies {
     implementation(libs.fragment)
     implementation(libs.cardview)
     implementation(libs.activity)
+    implementation(libs.splashscreen)
+    implementation(libs.navigation.fragment)
+    implementation(libs.navigation.ui)
     testImplementation(libs.junit)
     androidTestImplementation(libs.ext.junit)
     androidTestImplementation(libs.espresso.core)
