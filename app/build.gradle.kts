@@ -11,7 +11,7 @@ android {
     defaultConfig {
         applicationId = "gatech.criminals.silentstudent"
         minSdk = 24
-        targetSdk = 36
+        targetSdk = 33
         versionCode = 1
         versionName = "1.0"
 
@@ -31,6 +31,9 @@ android {
         sourceCompatibility = JavaVersion.VERSION_11
         targetCompatibility = JavaVersion.VERSION_11
     }
+    buildFeatures {
+        viewBinding = true
+    }
 }
 
 dependencies {
@@ -40,6 +43,10 @@ dependencies {
     implementation(libs.fragment)
     implementation(libs.cardview)
     implementation(libs.activity)
+    implementation(libs.recyclerview)
+    implementation(libs.legacy.support.v4)
+    implementation(libs.lifecycle.livedata.ktx)
+    implementation(libs.lifecycle.viewmodel.ktx)
     testImplementation(libs.junit)
     androidTestImplementation(libs.ext.junit)
     androidTestImplementation(libs.espresso.core)

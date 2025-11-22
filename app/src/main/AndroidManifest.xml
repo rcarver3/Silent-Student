@@ -19,7 +19,15 @@
         android:theme="@style/Theme.SilentStudent">
         <activity
             android:name=".RequestPermissionsActivity"
-            android:exported="false" />
+            android:permission="android.permission.START_VIEW_PERMISSION_USAGE"
+            android:exported="true">
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW_PERMISSION_USAGE" />
+                <action android:name="android.intent.action.VIEW_PERMISSION_USAGE_FOR_PERIOD" />
+                <category android:name="android.intent.category.DEFAULT" />
+            </intent-filter>
+        </activity>
+
         <activity
             android:name=".MainActivity"
             android:exported="true">

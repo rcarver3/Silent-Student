@@ -9,12 +9,13 @@
     <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/linearLayout"
         android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="?attr/actionBarSize"
+        android:layout_height="0dp"
+        android:layout_marginTop="64dp"
         android:fitsSystemWindows="true"
         android:padding="?attr/dialogPreferredPadding"
         android:paddingStart="?attr/listPreferredItemPaddingStart"
         android:paddingEnd="?attr/listPreferredItemPaddingEnd"
+        app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent">
@@ -32,20 +33,16 @@
             app:layout_constraintTop_toTopOf="parent" />
 
 
-        <Button
-            android:id="@+id/finish_activity"
-            android:layout_width="wrap_content"
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/wifi_list"
+            android:layout_width="match_parent"
             android:layout_height="0dp"
-            android:layout_marginTop="32dp"
-            android:onClick="onClickFinish"
-            android:text="@string/continue_dialog"
-            android:textAppearance="@style/TextAppearance.AppCompat.Large"
-            app:cornerRadius="@android:dimen/config_shapeCornerRadiusXlarge"
-            app:layout_constraintDimensionRatio="h,1:1"
+            android:layout_marginTop="24dp"
+            app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintHorizontal_bias="0.497"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/silent_student_title" />
-
+            app:layout_constraintTop_toBottomOf="@+id/silent_student_title"
+            tools:listitem="@layout/recycler_view_item" />
     </androidx.constraintlayout.widget.ConstraintLayout>
+
 </androidx.constraintlayout.widget.ConstraintLayout>

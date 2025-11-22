@@ -22,12 +22,7 @@ public class RequestPermissionsActivity extends AppCompatActivity {
 
     public void onClickGrantPermission(View view) {
         Log.d(REQUEST_TAG, "Permission granted!");
-        Intent perm = new Intent();
-        MainActivity.requestPermissionLauncher.launch(Manifest.permission.ACCESS_FINE_LOCATION);
-        // perm.putExtra(MainActivity.GRANTED_EXTRA, true);
-        // setResult(RequestPermissionsActivity.RESULT_OK, perm);
         finish();
-        // requestAppPermissions(this, REQUEST_TAG, LOCATION_PERMISSION_REQUEST_CODE);
     }
 
     public void onClickDenyPermission(View view) {

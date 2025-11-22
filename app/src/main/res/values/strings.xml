@@ -4,4 +4,6 @@
     <string name="grant_permissions">Grant Permissions</string>
     <string name="deny_permissions">Skip for now</string>
     <string name="continue_dialog">Continue</string>
+    <string name="SSID_text_heading">SSID</string>
+    <string name="BSSID_text_heading">BSSID</string>
 </resources>
