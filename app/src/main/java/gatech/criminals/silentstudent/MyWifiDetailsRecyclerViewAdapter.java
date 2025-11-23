@@ -1,62 +1,99 @@
 package gatech.criminals.silentstudent;
 
-import androidx.recyclerview.widget.RecyclerView;
-
+import android.net.wifi.ScanResult;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
-import gatech.criminals.silentstudent.placeholder.PlaceholderContent.PlaceholderItem;
-import gatech.criminals.silentstudent.databinding.WifiDetailsItemLayoutBinding;
+import androidx.annotation.NonNull;
+import androidx.recyclerview.widget.RecyclerView;
+import androidx.recyclerview.widget.RecyclerView.ViewHolder;
 
 import java.util.List;
 
 /**
- * {@link RecyclerView.Adapter} that can display a {@link PlaceholderItem}.
- * TODO: Replace the implementation with code for your data type.
+ * {@link RecyclerView.Adapter} that can display a {@link ScanResult}.
  */
-public class MyWifiDetailsRecyclerViewAdapter extends RecyclerView.Adapter<MyWifiDetailsRecyclerViewAdapter.ViewHolder> {
+public class MyWifiDetailsRecyclerViewAdapter extends RecyclerView.Adapter<ViewHolder> {
+    private static final int HEADER_POSITION = 0;
 
-    private final List<PlaceholderItem> mValues;
+    private static final int TYPE_HEADER = 0;
+    private static final int TYPE_ITEM = 1;
+    private final List<ScanResult> mWifiScanResults;
 
-    public MyWifiDetailsRecyclerViewAdapter(List<PlaceholderItem> items) {
-        mValues = items;
+    public MyWifiDetailsRecyclerViewAdapter(List<ScanResult> items) {
+        mWifiScanResults = items;
+    }
+
+    @NonNull
+    @Override
+    public ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
+        ViewHolder viewHolder;
+
+        if (viewType == TYPE_HEADER) {
+            viewHolder = new ViewHolderHeader(LayoutInflater.from(parent.getContext()).inflate(R.layout.wifi_details_item_heading_layout, parent, false));
+        } else if (viewType == TYPE_ITEM) {
+            viewHolder = new ViewHolderItem(LayoutInflater.from(parent.getContext()).inflate(R.layout.wifi_details_item_layout, parent, false));
+        } else {
+            throw new RuntimeException("There is no type that matches the type " + viewType + " \n");
+        }
+
+        return viewHolder;
     }
 
     @Override
-    public ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
+    public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
+        if (!(holder instanceof ViewHolderHeader)) {
+            if (holder instanceof ViewHolderItem) {
+                ViewHolderItem viewHolderItem = (ViewHolderItem) holder;
+                ScanResult currentScanResult = mWifiScanResults.get(position - 1);
 
-        return new ViewHolder(WifiDetailsItemLayoutBinding.inflate(LayoutInflater.from(parent.getContext()), parent, false));
-
+                viewHolderItem.mSsidTextView.setText(currentScanResult.SSID);
+                viewHolderItem.mBssidTextView.setText(currentScanResult.BSSID);
+            } else {
+                throw new RuntimeException(holder + " isn't a valid scan result or view holder.");
+            }
+        }
     }
 
-    @Override
-    public void onBindViewHolder(final ViewHolder holder, int position) {
-        holder.mItem = mValues.get(position);
-        holder.mIdView.setText(mValues.get(position).id);
-        holder.mContentView.setText(mValues.get(position).content);
+    public void updateData(List<ScanResult> newScan) {
+        int itemCount = mWifiScanResults.size();
+        mWifiScanResults.clear();
+        notifyItemRangeRemoved(0, itemCount);
+
+        if ((newScan != null) && (!newScan.isEmpty())) {
+            mWifiScanResults.addAll(newScan);
+            notifyItemRangeInserted(0, mWifiScanResults.size());
+        }
     }
 
     @Override
     public int getItemCount() {
-        return mValues.size();
+        return mWifiScanResults.size() + 1;
     }
 
-    public class ViewHolder extends RecyclerView.ViewHolder {
-        public final TextView mIdView;
-        public final TextView mContentView;
-        public PlaceholderItem mItem;
-
-        public ViewHolder(WifiDetailsItemLayoutBinding binding) {
-            super(binding.getRoot());
-            mIdView = binding.itemNumber;
-            mContentView = binding.content;
+    @Override
+    public int getItemViewType(int position) {
+        if (position == HEADER_POSITION) {
+            return TYPE_HEADER;
+        } else {
+            return TYPE_ITEM;
         }
+    }
 
-        @Override
-        public String toString() {
-            return super.toString() + " '" + mContentView.getText() + "'";
+    public static class ViewHolderHeader extends RecyclerView.ViewHolder {
+        public ViewHolderHeader(View view) { super(view); }
+    }
+
+    public static class ViewHolderItem extends RecyclerView.ViewHolder {
+        public TextView mSsidTextView;
+        public TextView mBssidTextView;
+
+        public ViewHolderItem(View view) {
+            super(view);
+            mSsidTextView = view.findViewById(R.id.ssid_wifi_item);
+            mBssidTextView = view.findViewById(R.id.bssid_wifi_item);
         }
     }
 }

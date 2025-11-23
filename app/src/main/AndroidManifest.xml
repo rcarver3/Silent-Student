@@ -18,7 +18,7 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.SilentStudent">
         <activity
-            android:name=".RequestPermissionsActivity"
+            android:name=".PermissionsRationaleFragment"
             android:permission="android.permission.START_VIEW_PERMISSION_USAGE"
             android:exported="true">
             <intent-filter>

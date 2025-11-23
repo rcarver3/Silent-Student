@@ -3,16 +3,16 @@ package gatech.criminals.silentstudent;
 import android.Manifest;
 import android.content.Intent;
 import android.content.pm.PackageManager;
-import android.net.wifi.WifiManager;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
-import android.widget.Toast;
 
+import androidx.activity.result.ActivityResultCallerLauncher;
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
+import androidx.fragment.app.FragmentManager;
 
 public class MainActivity extends AppCompatActivity {
     // To identify MainActivity in LogCat
@@ -23,7 +23,6 @@ public class MainActivity extends AppCompatActivity {
     private static final String GRANTED_EXTRA = "gatech.criminals.silentstudent.granted";
     private boolean locGranted = false;
 
-    private WifiManager wm;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -35,22 +34,29 @@ public class MainActivity extends AppCompatActivity {
                 locGranted = true;
             }
         });
-        if (!checkPermissions()) {
-            setContentView(R.layout.activity_start);
-        } else {
-            setContentView(R.layout.activity_main);
-        }
+        setContentView(R.layout.activity_main);
+//        if (savedInstanceState == null) {
+//            getSupportFragmentManager().beginTransaction()
+//                    .setReorderingAllowed(true)
+//                    .add(R.id.wifi_list_recycler_view, WifiDetailsFragment.class, null)
+//                    .commit();
+//        }
+//        if (!checkPermissions()) {
+//            setContentView(R.layout.activity_start);
+//        } else {
+//            setContentView(R.layout.activity_main);
+//        }
     }
 
-    protected void viewNearbyWifiAP() {
-        if (!checkPermissions()) {
-            Log.d(MAIN_TAG, "Permissions not granted, couldn't complete");
-            getPermissions();
-            return;
-        }
-        Log.d(MAIN_TAG, "Has permissions, displaying wifi info.");
+//    protected void viewNearbyWifiAP() {
+//        if (!checkPermissions()) {
+//            Log.d(MAIN_TAG, "Permissions not granted, couldn't complete");
+//            getPermissions();
+//            return;
+//        }
+//        Log.d(MAIN_TAG, "Has permissions, displaying wifi info.");
 //        wm.getScanResults();
-    }
+//    }
 
     public void onClickContinue(View view) {
         Log.d(MAIN_TAG, "Checking permissions");
@@ -61,23 +67,22 @@ public class MainActivity extends AppCompatActivity {
     }
     public void onClickFinish(View view) {
         Log.d(MAIN_TAG, "Checking permissions");
-        viewNearbyWifiAP();
     }
 
-    private boolean checkPermissions() {
+    public boolean checkPermissions() {
         if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
             Log.d(MAIN_TAG, "Has permissions, displaying wifi info.");
             return true;
         }
         return false;
     }
-    private void getPermissions() {
+    public void getPermissions() {
         if (shouldShowRequestPermissionRationale(Manifest.permission.ACCESS_FINE_LOCATION)) {
-            Log.d(MAIN_TAG, "starting permissions activity");
-            Intent permissionIntent = new Intent(this, RequestPermissionsActivity.class);
-            startActivity(permissionIntent);
+            Log.d(MAIN_TAG, "starting permissions rationale dialog");
+            new PermissionsRationaleFragment().show(getSupportFragmentManager(), PermissionsRationaleFragment.REQUEST_TAG);
+        } else {
+            requestPermissionLauncher.launch(Manifest.permission.ACCESS_FINE_LOCATION);
         }
-        requestPermissionLauncher.launch(Manifest.permission.ACCESS_FINE_LOCATION);
     }
 
 //    private void checkAndGetPermission() {

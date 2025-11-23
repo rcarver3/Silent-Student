@@ -2,12 +2,26 @@
 <androidx.recyclerview.widget.RecyclerView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    android:id="@+id/list"
+    android:id="@+id/wifi_list_recycler_view"
     android:name="gatech.criminals.silentstudent.WifiDetailsFragment"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:layout_marginLeft="16dp"
     android:layout_marginRight="16dp"
-    app:layoutManager="LinearLayoutManager"
     tools:context=".WifiDetailsFragment"
-    tools:listitem="@layout/wifi_details_item_layout" />
+    app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager">
+
+    <Button
+        android:id="@+id/scan_wifi_button"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="16dp"
+        android:layout_marginEnd="16dp"
+        android:layout_marginBottom="8dp"
+        android:onClick="onClickScanWifi"
+        android:text="@string/scan_wifi_button_label"
+        android:visibility="visible"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent" />
+</androidx.recyclerview.widget.RecyclerView>

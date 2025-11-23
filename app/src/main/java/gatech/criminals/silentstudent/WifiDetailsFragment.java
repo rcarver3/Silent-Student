@@ -1,8 +1,14 @@
 package gatech.criminals.silentstudent;
 
+import android.content.BroadcastReceiver;
 import android.content.Context;
+import android.content.Intent;
+import android.content.IntentFilter;
+import android.net.wifi.ScanResult;
+import android.net.wifi.WifiManager;
 import android.os.Bundle;
 
+import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.LinearLayoutManager;
@@ -12,7 +18,8 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
-import gatech.criminals.silentstudent.placeholder.PlaceholderContent;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * A fragment representing a list of Items.
@@ -22,6 +29,12 @@ public class WifiDetailsFragment extends Fragment {
     // TODO: Customize parameter argument names
     private static final String ARG_COLUMN_COUNT = "column-count";
     // TODO: Customize parameters
+    private static final String TAG = "WifiDetailsFragment";
+    List<ScanResult> mScanResults;
+
+    private WifiManager mWifiManager;
+    private BroadcastReceiver mWifiReceiver;
+    private MyWifiDetailsRecyclerViewAdapter mAdapter;
     private int mColumnCount = 1;
 
     /**
@@ -45,6 +58,18 @@ public class WifiDetailsFragment extends Fragment {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
+        mWifiManager = (WifiManager) requireContext().getSystemService(Context.WIFI_SERVICE);
+        mWifiReceiver = new BroadcastReceiver() {
+            @Override
+            public void onReceive(Context context, Intent intent) {
+                List<ScanResult> scanResults = mWifiManager.getScanResults();
+                if (scanResults != null) {
+                    mAdapter.updateData(scanResults);
+                }
+            }
+        };
+        requireContext().registerReceiver(mWifiReceiver, new IntentFilter(WifiManager.SCAN_RESULTS_AVAILABLE_ACTION));
+
         if (getArguments() != null) {
             mColumnCount = getArguments().getInt(ARG_COLUMN_COUNT);
         }
@@ -53,19 +78,35 @@ public class WifiDetailsFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        View view = inflater.inflate(R.layout.wifi_details_list_layout, container, false);
+        return inflater.inflate(R.layout.wifi_details_list_layout, container, false);
+    }
+
+    @Override
+    public void onViewCreated(@NonNull View view, Bundle savedInstanceState) {
 
         // Set the adapter
         if (view instanceof RecyclerView) {
             Context context = view.getContext();
+
             RecyclerView recyclerView = (RecyclerView) view;
+            mScanResults = new ArrayList<>();
+            mAdapter = new MyWifiDetailsRecyclerViewAdapter(mScanResults);
+            recyclerView.setAdapter(mAdapter);
+
             if (mColumnCount <= 1) {
                 recyclerView.setLayoutManager(new LinearLayoutManager(context));
             } else {
                 recyclerView.setLayoutManager(new GridLayoutManager(context, mColumnCount));
             }
-            recyclerView.setAdapter(new MyWifiDetailsRecyclerViewAdapter(PlaceholderContent.ITEMS));
+            recyclerView.setHasFixedSize(true);
+
         }
-        return view;
+
+    }
+
+    public void onClickScanWifi() {
+        if (mWifiManager.isWifiEnabled()) {
+            mWifiManager.startScan();
+        }
     }
 }

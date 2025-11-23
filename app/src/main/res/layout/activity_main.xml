@@ -32,17 +32,14 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
 
-
-        <androidx.recyclerview.widget.RecyclerView
-            android:id="@+id/wifi_list"
-            android:layout_width="match_parent"
-            android:layout_height="0dp"
-            android:layout_marginTop="24dp"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/silent_student_title"
-            tools:listitem="@layout/recycler_view_item" />
+        <androidx.fragment.app.FragmentContainerView
+            android:id="@+id/wifi_list_recycler_view"
+            android:name="gatech.criminals.silentstudent.WifiDetailsFragment"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            tools:layout="@layout/wifi_details_list_layout"
+            app:layout_constraintTop_toBottomOf="@id/silent_student_title"
+            app:layout_constraintStart_toStartOf="parent"/>
     </androidx.constraintlayout.widget.ConstraintLayout>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

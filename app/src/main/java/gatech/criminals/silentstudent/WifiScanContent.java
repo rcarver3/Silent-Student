@@ -1,4 +1,4 @@
-package gatech.criminals.silentstudent.placeholder;
+package gatech.criminals.silentstudent;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -11,17 +11,17 @@ import java.util.Map;
  * <p>
  * TODO: Replace all uses of this class before publishing your app.
  */
-public class PlaceholderContent {
+public class WifiScanContent {
 
     /**
      * An array of sample (placeholder) items.
      */
-    public static final List<PlaceholderItem> ITEMS = new ArrayList<PlaceholderItem>();
+    public static final List<ScanResultItem> ITEMS = new ArrayList<ScanResultItem>();
 
     /**
      * A map of sample (placeholder) items, by ID.
      */
-    public static final Map<String, PlaceholderItem> ITEM_MAP = new HashMap<String, PlaceholderItem>();
+    public static final Map<String, ScanResultItem> ITEM_MAP = new HashMap<String, ScanResultItem>();
 
     private static final int COUNT = 25;
 
@@ -32,13 +32,13 @@ public class PlaceholderContent {
         }
     }
 
-    private static void addItem(PlaceholderItem item) {
+    private static void addItem(ScanResultItem item) {
         ITEMS.add(item);
         ITEM_MAP.put(item.id, item);
     }
 
-    private static PlaceholderItem createPlaceholderItem(int position) {
-        return new PlaceholderItem(String.valueOf(position), "Item " + position, makeDetails(position));
+    private static ScanResultItem createPlaceholderItem(int position) {
+        return new ScanResultItem(String.valueOf(position), "Item " + position, makeDetails(position));
     }
 
     private static String makeDetails(int position) {
@@ -53,12 +53,12 @@ public class PlaceholderContent {
     /**
      * A placeholder item representing a piece of content.
      */
-    public static class PlaceholderItem {
+    public static class ScanResultItem {
         public final String id;
         public final String content;
         public final String details;
 
-        public PlaceholderItem(String id, String content, String details) {
+        public ScanResultItem(String id, String content, String details) {
             this.id = id;
             this.content = content;
             this.details = details;
