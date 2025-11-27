@@ -12,9 +12,10 @@ import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
+import androidx.fragment.app.FragmentActivity;
 import androidx.fragment.app.FragmentManager;
 
-public class MainActivity extends AppCompatActivity {
+public class MainActivity extends FragmentActivity {
     // To identify MainActivity in LogCat
     private static final String MAIN_TAG = "MainActivity";
     private static final int LOCATION_PERMISSION_REQUEST_CODE = 1;

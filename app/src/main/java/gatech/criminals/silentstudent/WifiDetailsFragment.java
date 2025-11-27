@@ -86,9 +86,9 @@ public class WifiDetailsFragment extends Fragment {
 
         // Set the adapter
         if (view instanceof RecyclerView) {
+            RecyclerView recyclerView = (RecyclerView) view;
             Context context = view.getContext();
 
-            RecyclerView recyclerView = (RecyclerView) view;
             mScanResults = new ArrayList<>();
             mAdapter = new MyWifiDetailsRecyclerViewAdapter(mScanResults);
             recyclerView.setAdapter(mAdapter);
