@@ -125,12 +125,4 @@ public class WifiDetailsFragment extends Fragment {
             mWifiManager.startScan();
         }
     }
-
-    private void checkPermissions() {
-        Log.d(TAG, "checkPermissions started");
-        MainActivity parent = (MainActivity) requireHost();
-        if (!parent.checkPermissions()) {
-            parent.getPermissions();
-        }
-    }
 }

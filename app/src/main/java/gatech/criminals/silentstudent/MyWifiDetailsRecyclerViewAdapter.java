@@ -50,9 +50,8 @@ public class MyWifiDetailsRecyclerViewAdapter extends RecyclerView.Adapter<ViewH
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
         Log.d(TAG, "onBindViewHolder start");
         if (!(holder instanceof ViewHolderHeader)) {
-            if (holder instanceof ViewHolderItem) {
+            if (holder instanceof ViewHolderItem viewHolderItem) {
                 Log.d(TAG, "ViewHolder is item");
-                ViewHolderItem viewHolderItem = (ViewHolderItem) holder;
                 ScanResult currentScanResult = mWifiScanResults.get(position - 1);
 
                 viewHolderItem.mSsidTextView.setText(currentScanResult.SSID);

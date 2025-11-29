@@ -14,21 +14,7 @@ import androidx.core.app.ActivityCompat;
 public class MainActivity extends AppCompatActivity {
     // To identify MainActivity in LogCat
     private static final String TAG = "MainActivity";
-    private static final int LOCATION_PERMISSION_REQUEST_CODE = 1;
     public static ActivityResultLauncher<String> requestPermissionLauncher;
-
-    private static final String GRANTED_EXTRA = "gatech.criminals.silentstudent.granted";
-
-    public boolean isLocGranted() {
-        return locGranted;
-    }
-
-    public void setLocGranted(boolean locGranted) {
-        this.locGranted = locGranted;
-    }
-
-    private boolean locGranted = false;
-
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -37,7 +23,6 @@ public class MainActivity extends AppCompatActivity {
         requestPermissionLauncher = registerForActivityResult(new ActivityResultContracts.RequestPermission(), isGranted -> {
             if (isGranted) {
                 Log.d(TAG, "Permissions granted");
-                locGranted = true;
             }
         });
         setContentView(R.layout.activity_main);
