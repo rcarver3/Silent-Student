@@ -89,7 +89,9 @@ public class MyWifiDetailsRecyclerViewAdapter extends RecyclerView.Adapter<ViewH
     }
 
     public static class ViewHolderHeader extends RecyclerView.ViewHolder {
-        public ViewHolderHeader(View view) { super(view); }
+        public ViewHolderHeader(View view) {
+            super(view);
+        }
     }
 
     public static class ViewHolderItem extends RecyclerView.ViewHolder {

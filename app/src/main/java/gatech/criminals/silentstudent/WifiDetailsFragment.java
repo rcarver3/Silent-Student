@@ -89,8 +89,7 @@ public class WifiDetailsFragment extends Fragment {
     }
 
     @Override
-    public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container,
-                             Bundle savedInstanceState) {
+    public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         Log.d(TAG, "onCreateView start.\nContainer: " + container);
         binding = FragmentMainBinding.inflate(getLayoutInflater(), container, false);
         return binding.getRoot();
@@ -102,20 +101,20 @@ public class WifiDetailsFragment extends Fragment {
         binding.scanWifiButton.setOnClickListener(this::onClickScanWifi);
 
         // Set the adapter
-            Log.d(TAG, "view is RecyclerView, starting creation");
-            Context context = view.getContext();
-            RecyclerView recyclerView = binding.wifiListRecyclerView;
+        Log.d(TAG, "view is RecyclerView, starting creation");
+        Context context = view.getContext();
+        RecyclerView recyclerView = binding.wifiListRecyclerView;
 
-            mScanResults = new ArrayList<>();
-            mAdapter = new MyWifiDetailsRecyclerViewAdapter(mScanResults);
-            recyclerView.setAdapter(mAdapter);
+        mScanResults = new ArrayList<>();
+        mAdapter = new MyWifiDetailsRecyclerViewAdapter(mScanResults);
+        recyclerView.setAdapter(mAdapter);
 
-            if (mColumnCount <= 1) {
-                recyclerView.setLayoutManager(new LinearLayoutManager(context));
-            } else {
-                recyclerView.setLayoutManager(new GridLayoutManager(context, mColumnCount));
-            }
-            recyclerView.setHasFixedSize(true);
+        if (mColumnCount <= 1) {
+            recyclerView.setLayoutManager(new LinearLayoutManager(context));
+        } else {
+            recyclerView.setLayoutManager(new GridLayoutManager(context, mColumnCount));
+        }
+        recyclerView.setHasFixedSize(true);
     }
 
     public void onClickScanWifi(View view) {
