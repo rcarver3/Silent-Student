@@ -9,19 +9,20 @@ import android.content.pm.PackageManager;
 import android.net.wifi.ScanResult;
 import android.net.wifi.WifiManager;
 import android.os.Bundle;
-
-import androidx.annotation.NonNull;
-import androidx.annotation.RequiresPermission;
-import androidx.core.app.ActivityCompat;
-import androidx.fragment.app.Fragment;
-import androidx.recyclerview.widget.GridLayoutManager;
-import androidx.recyclerview.widget.LinearLayoutManager;
-import androidx.recyclerview.widget.RecyclerView;
-
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+
+import androidx.activity.result.ActivityResultLauncher;
+import androidx.activity.result.contract.ActivityResultContracts;
+import androidx.annotation.NonNull;
+import androidx.annotation.RequiresPermission;
+import androidx.core.app.ActivityCompat;
+import androidx.fragment.app.DialogFragment;
+import androidx.fragment.app.Fragment;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -29,36 +30,24 @@ import java.util.List;
 import gatech.criminals.silentstudent.databinding.FragmentMainBinding;
 
 /**
- * A fragment representing a list of Items.
+ * Main {@link Fragment} that shows the title, scan Wifi button, and the RecyclerView that holds
+ * the details about the surrounding Wifi networks.
  */
-public class WifiDetailsFragment extends Fragment {
-
-    // TODO: Customize parameter argument names
-    private static final String ARG_COLUMN_COUNT = "column-count";
-    // TODO: Customize parameters
+public class WifiDetailsFragment extends Fragment implements PermissionsRationaleFragment.RationaleDialogListener {
     private static final String TAG = "WifiDetailsFragment";
+    public static ActivityResultLauncher<String> requestPermissionLauncher;
     List<ScanResult> mScanResults;
-    private FragmentMainBinding binding;
-
+    private FragmentMainBinding mBinding;
     private WifiManager mWifiManager;
-    private MyWifiDetailsRecyclerViewAdapter mAdapter;
-    private int mColumnCount = 1;
+    private WifiDetailsAdapter mWifiDetailsAdapter;
+    private BroadcastReceiver mWifiReceiver;
 
     /**
      * Mandatory empty constructor for the fragment manager to instantiate the
      * fragment (e.g. upon screen orientation changes).
      */
     public WifiDetailsFragment() {
-    }
-
-    // TODO: Customize parameter initialization
-    @SuppressWarnings("unused")
-    public static WifiDetailsFragment newInstance(int columnCount) {
-        WifiDetailsFragment fragment = new WifiDetailsFragment();
-        Bundle args = new Bundle();
-        args.putInt(ARG_COLUMN_COUNT, columnCount);
-        fragment.setArguments(args);
-        return fragment;
+        super(R.layout.fragment_main);
     }
 
     @Override
@@ -68,60 +57,103 @@ public class WifiDetailsFragment extends Fragment {
 
         mWifiManager = (WifiManager) requireContext().getSystemService(Context.WIFI_SERVICE);
         Log.d(TAG, "creating broadcast receiver");
-        BroadcastReceiver mWifiReceiver = new BroadcastReceiver() {
+        mWifiReceiver = new BroadcastReceiver() {
             @RequiresPermission(Manifest.permission.ACCESS_FINE_LOCATION)
             @Override
             public void onReceive(Context context, Intent intent) {
+                Log.d(TAG, "scan results received");
                 if (ActivityCompat.checkSelfPermission(requireContext(), Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
+                    Log.d(TAG, "fragment has permission, getting scan results");
                     mScanResults = mWifiManager.getScanResults();
+                } else {
+                    Log.d(TAG, "fragment does not have permission!");
                 }
                 if (mScanResults != null) {
-                    mAdapter.updateData(mScanResults);
+                    Log.d(TAG, "mScanResults is not null, updating data");
+                    mWifiDetailsAdapter.updateData(mScanResults);
+                } else {
+                    Log.d(TAG, "mScanResults was null!");
                 }
             }
         };
         requireContext().registerReceiver(mWifiReceiver, new IntentFilter(WifiManager.SCAN_RESULTS_AVAILABLE_ACTION));
         Log.d(TAG, "registered broadcast receiver as mWifiReceiver");
 
-        if (getArguments() != null) {
-            mColumnCount = getArguments().getInt(ARG_COLUMN_COUNT);
-        }
+        requestPermissionLauncher = registerForActivityResult(new ActivityResultContracts.RequestPermission(), isGranted -> {
+            if (isGranted) {
+                Log.d(TAG, "Permissions granted, attempting scan now");
+                startWifiScan();
+            } else {
+                Log.d(TAG, "Permission denied by user");
+            }
+        });
     }
 
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         Log.d(TAG, "onCreateView start.\nContainer: " + container);
-        binding = FragmentMainBinding.inflate(getLayoutInflater(), container, false);
-        return binding.getRoot();
+        mBinding = FragmentMainBinding.inflate(getLayoutInflater(), container, false);
+        return mBinding.getRoot();
     }
 
     @Override
     public void onViewCreated(@NonNull View view, Bundle savedInstanceState) {
         Log.d(TAG, "onViewCreated start.\nView: " + view);
-        binding.scanWifiButton.setOnClickListener(this::onClickScanWifi);
+        mBinding.scanWifiButton.setOnClickListener(v -> onClickScanWifi());
 
         // Set the adapter
         Log.d(TAG, "view is RecyclerView, starting creation");
         Context context = view.getContext();
-        RecyclerView recyclerView = binding.wifiListRecyclerView;
+        RecyclerView recyclerView = mBinding.wifiListRecyclerView;
 
         mScanResults = new ArrayList<>();
-        mAdapter = new MyWifiDetailsRecyclerViewAdapter(mScanResults);
-        recyclerView.setAdapter(mAdapter);
+        mWifiDetailsAdapter = new WifiDetailsAdapter(mScanResults);
+        recyclerView.setAdapter(mWifiDetailsAdapter);
 
-        if (mColumnCount <= 1) {
-            recyclerView.setLayoutManager(new LinearLayoutManager(context));
-        } else {
-            recyclerView.setLayoutManager(new GridLayoutManager(context, mColumnCount));
-        }
+        recyclerView.setLayoutManager(new LinearLayoutManager(context));
         recyclerView.setHasFixedSize(true);
     }
 
-    public void onClickScanWifi(View view) {
+    public void onClickScanWifi() {
         Log.d(TAG, "starting onClickScanWifi");
-        if (mWifiManager.isWifiEnabled()) {
-            Log.d(TAG, "scanning wifi now");
-            mWifiManager.startScan();
+        startWifiScan();
+    }
+
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+
+        if (mWifiReceiver != null) {
+            requireContext().unregisterReceiver(mWifiReceiver);
+            Log.d(TAG, "unregistered mWifiReceiver");
         }
+    }
+
+    private void startWifiScan() {
+        if (ActivityCompat.checkSelfPermission(requireContext(), Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
+            if (mWifiManager.isWifiEnabled()) {
+                Log.d(TAG, "scanning wifi now");
+                if (!mWifiManager.startScan()) {
+                    Log.w(TAG, "Wifi scan did not start, try again soon");
+                } else {
+                    Log.d(TAG, "wifi scan started successfully!");
+                }
+            } else {
+                Log.d(TAG, "wifi is not enabled!! Start it now!!");
+            }
+        } else if (shouldShowRequestPermissionRationale(Manifest.permission.ACCESS_FINE_LOCATION)) {
+            Log.d(TAG, "Showing permission rationale dialog");
+            PermissionsRationaleFragment dialog = new PermissionsRationaleFragment();
+            dialog.show(getChildFragmentManager(), "PermissionsRationaleFragment");
+        } else {
+            Log.d(TAG, "Requesting permission for first time (or selected don't ask again_)");
+            requestPermissionLauncher.launch(Manifest.permission.ACCESS_FINE_LOCATION);
+        }
+    }
+
+    @Override
+    public void onDialogPositiveClick(DialogFragment dialog) {
+        Log.d(TAG, "user clicked continue from rationale dialog, requesting permissions now");
+        requestPermissionLauncher.launch(Manifest.permission.ACCESS_FINE_LOCATION);
     }
 }
