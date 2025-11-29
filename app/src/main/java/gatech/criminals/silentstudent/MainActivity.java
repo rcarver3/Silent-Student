@@ -1,37 +1,42 @@
 package gatech.criminals.silentstudent;
 
 import android.Manifest;
-import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 
-import androidx.activity.result.ActivityResultCallerLauncher;
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
-import androidx.fragment.app.FragmentActivity;
-import androidx.fragment.app.FragmentManager;
 
-public class MainActivity extends FragmentActivity {
+public class MainActivity extends AppCompatActivity {
     // To identify MainActivity in LogCat
-    private static final String MAIN_TAG = "MainActivity";
+    private static final String TAG = "MainActivity";
     private static final int LOCATION_PERMISSION_REQUEST_CODE = 1;
     public static ActivityResultLauncher<String> requestPermissionLauncher;
 
     private static final String GRANTED_EXTRA = "gatech.criminals.silentstudent.granted";
+
+    public boolean isLocGranted() {
+        return locGranted;
+    }
+
+    public void setLocGranted(boolean locGranted) {
+        this.locGranted = locGranted;
+    }
+
     private boolean locGranted = false;
 
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        Log.d(MAIN_TAG, "Starting main activity");
+        Log.d(TAG, "Starting main activity");
         requestPermissionLauncher = registerForActivityResult(new ActivityResultContracts.RequestPermission(), isGranted -> {
             if (isGranted) {
-                Log.d(MAIN_TAG, "You have network access!!");
+                Log.d(TAG, "Permissions granted");
                 locGranted = true;
             }
         });
@@ -60,26 +65,26 @@ public class MainActivity extends FragmentActivity {
 //    }
 
     public void onClickContinue(View view) {
-        Log.d(MAIN_TAG, "Checking permissions");
+        Log.d(TAG, "Checking permissions");
         getPermissions();
         if (checkPermissions()) {
             setContentView(R.layout.activity_main);
         }
     }
     public void onClickFinish(View view) {
-        Log.d(MAIN_TAG, "Checking permissions");
+        Log.d(TAG, "Checking permissions");
     }
 
     public boolean checkPermissions() {
         if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
-            Log.d(MAIN_TAG, "Has permissions, displaying wifi info.");
+            Log.d(TAG, "Has permissions, displaying wifi info.");
             return true;
         }
         return false;
     }
     public void getPermissions() {
         if (shouldShowRequestPermissionRationale(Manifest.permission.ACCESS_FINE_LOCATION)) {
-            Log.d(MAIN_TAG, "starting permissions rationale dialog");
+            Log.d(TAG, "starting permissions rationale dialog");
             new PermissionsRationaleFragment().show(getSupportFragmentManager(), PermissionsRationaleFragment.REQUEST_TAG);
         } else {
             requestPermissionLauncher.launch(Manifest.permission.ACCESS_FINE_LOCATION);

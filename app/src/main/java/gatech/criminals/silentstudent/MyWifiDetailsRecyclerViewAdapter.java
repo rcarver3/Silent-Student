@@ -1,6 +1,7 @@
 package gatech.criminals.silentstudent;
 
 import android.net.wifi.ScanResult;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -16,8 +17,8 @@ import java.util.List;
  * {@link RecyclerView.Adapter} that can display a {@link ScanResult}.
  */
 public class MyWifiDetailsRecyclerViewAdapter extends RecyclerView.Adapter<ViewHolder> {
+    private static final String TAG = "WifiDetailsAdapter";
     private static final int HEADER_POSITION = 0;
-
     private static final int TYPE_HEADER = 0;
     private static final int TYPE_ITEM = 1;
     private final List<ScanResult> mWifiScanResults;
@@ -29,11 +30,14 @@ public class MyWifiDetailsRecyclerViewAdapter extends RecyclerView.Adapter<ViewH
     @NonNull
     @Override
     public ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
+        Log.d(TAG, "onCreateViewHolder start");
         ViewHolder viewHolder;
 
         if (viewType == TYPE_HEADER) {
+            Log.d(TAG, "recycler view header");
             viewHolder = new ViewHolderHeader(LayoutInflater.from(parent.getContext()).inflate(R.layout.wifi_details_item_heading_layout, parent, false));
         } else if (viewType == TYPE_ITEM) {
+            Log.d(TAG, "recycler view item");
             viewHolder = new ViewHolderItem(LayoutInflater.from(parent.getContext()).inflate(R.layout.wifi_details_item_layout, parent, false));
         } else {
             throw new RuntimeException("There is no type that matches the type " + viewType + " \n");
@@ -44,8 +48,10 @@ public class MyWifiDetailsRecyclerViewAdapter extends RecyclerView.Adapter<ViewH
 
     @Override
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
+        Log.d(TAG, "onBindViewHolder start");
         if (!(holder instanceof ViewHolderHeader)) {
             if (holder instanceof ViewHolderItem) {
+                Log.d(TAG, "ViewHolder is item");
                 ViewHolderItem viewHolderItem = (ViewHolderItem) holder;
                 ScanResult currentScanResult = mWifiScanResults.get(position - 1);
 
@@ -58,6 +64,7 @@ public class MyWifiDetailsRecyclerViewAdapter extends RecyclerView.Adapter<ViewH
     }
 
     public void updateData(List<ScanResult> newScan) {
+        Log.d(TAG, "updateData start");
         int itemCount = mWifiScanResults.size();
         mWifiScanResults.clear();
         notifyItemRangeRemoved(0, itemCount);
