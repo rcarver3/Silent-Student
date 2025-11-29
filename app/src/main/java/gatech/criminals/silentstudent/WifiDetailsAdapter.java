@@ -70,6 +70,7 @@ public class WifiDetailsAdapter extends RecyclerView.Adapter<ViewHolder> {
     public static class ViewHolderItem extends RecyclerView.ViewHolder {
         public TextView mSsidTextView;
         public TextView mBssidTextView;
+        // TODO: maybe signal strength indicator is more interesting?
 
         public ViewHolderItem(View view) {
             super(view);
