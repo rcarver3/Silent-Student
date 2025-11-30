@@ -3,21 +3,21 @@ package gatech.criminals.silentstudent;
 import android.net.wifi.ScanResult;
 import android.util.Log;
 import android.view.LayoutInflater;
-import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
-import androidx.recyclerview.widget.RecyclerView.ViewHolder;
 
 import java.util.List;
+
+import gatech.criminals.silentstudent.databinding.WifiDetailsItemLayoutBinding;
 
 /**
  * {@link RecyclerView.Adapter} that can display a {@link ScanResult} via its {@link ScanResult#SSID}
  * and its {@link ScanResult#BSSID}.
  */
-public class WifiDetailsAdapter extends RecyclerView.Adapter<ViewHolder> {
+public class WifiDetailsAdapter extends RecyclerView.Adapter<WifiDetailsAdapter.ViewHolder> {
     private static final String TAG = "WifiDetailsAdapter";
     private final List<ScanResult> mWifiScanResults;
 
@@ -29,25 +29,22 @@ public class WifiDetailsAdapter extends RecyclerView.Adapter<ViewHolder> {
     @Override
     public ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         Log.d(TAG, "onCreateViewHolder start");
-        return new ViewHolderItem(LayoutInflater.from(parent.getContext()).inflate(R.layout.wifi_details_item_layout, parent, false));
+        WifiDetailsItemLayoutBinding mBinding = WifiDetailsItemLayoutBinding.inflate(LayoutInflater.from(parent.getContext()), parent, false);
+        return new ViewHolder(mBinding);
     }
 
     @Override
-    public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
+    public void onBindViewHolder(@NonNull ViewHolder viewHolder, int position) {
         Log.d(TAG, "onBindViewHolder start");
-        if (holder instanceof ViewHolderItem viewHolderItem) {
-            if (mWifiScanResults.isEmpty()) {
-                Log.d(TAG, "mWifiScanResults is empty");
-                return;
-            }
-
-            Log.d(TAG, "setting ssid and bssid at position: " + position);
-            ScanResult currentScanResult = mWifiScanResults.get(position);
-            viewHolderItem.mSsidTextView.setText(currentScanResult.SSID);
-            viewHolderItem.mBssidTextView.setText(currentScanResult.BSSID);
-        } else {
-            throw new RuntimeException(holder + " isn't a valid scan result or view holder.");
+        if (mWifiScanResults.isEmpty()) {
+            Log.d(TAG, "mWifiScanResults is empty");
+            return;
         }
+
+        Log.d(TAG, "setting ssid and bssid at position: " + position);
+        ScanResult currentScanResult = mWifiScanResults.get(position);
+        viewHolder.mSsidTextView.setText(currentScanResult.SSID);
+        viewHolder.mBssidTextView.setText(currentScanResult.BSSID);
     }
 
     public void updateData(List<ScanResult> newScan) {
@@ -64,18 +61,19 @@ public class WifiDetailsAdapter extends RecyclerView.Adapter<ViewHolder> {
 
     @Override
     public int getItemCount() {
-        return mWifiScanResults.size() + 1;
+        return mWifiScanResults.size();
     }
 
-    public static class ViewHolderItem extends RecyclerView.ViewHolder {
+    public static class ViewHolder extends RecyclerView.ViewHolder {
         public TextView mSsidTextView;
         public TextView mBssidTextView;
         // TODO: maybe signal strength indicator is more interesting?
 
-        public ViewHolderItem(View view) {
-            super(view);
-            mSsidTextView = view.findViewById(R.id.ssid_wifi_item);
-            mBssidTextView = view.findViewById(R.id.bssid_wifi_item);
+        public ViewHolder(WifiDetailsItemLayoutBinding binding) {
+            super(binding.getRoot());
+
+            mSsidTextView = binding.ssidWifiItem;
+            mBssidTextView = binding.bssidWifiItem;
         }
     }
 }
