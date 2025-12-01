@@ -1,22 +1,30 @@
 package gatech.criminals.silentstudent;
 
+import static android.net.ConnectivityManager.NetworkCallback.FLAG_INCLUDE_LOCATION_INFO;
+
 import android.Manifest;
 import android.app.NotificationManager;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.content.pm.PackageManager;
 import android.media.AudioManager;
 import android.net.ConnectivityManager;
 import android.net.Network;
 import android.net.NetworkCapabilities;
 import android.net.NetworkRequest;
 import android.net.wifi.WifiInfo;
+import android.net.wifi.WifiManager;
 import android.provider.Settings;
 import android.util.Log;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.annotation.RequiresPermission;
+import androidx.core.app.ActivityCompat;
+
+import java.util.Objects;
 
 public class WifiBackgroundMonitor {
     private static final String TAG = "WifiBackgroundMonitor";
@@ -34,13 +42,17 @@ public class WifiBackgroundMonitor {
         ConnectivityManager cm = (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
 
         NetworkRequest request = new NetworkRequest.Builder().addTransportType(NetworkCapabilities.TRANSPORT_WIFI).build();
-        mNetworkCallback = new ConnectivityManager.NetworkCallback() {
+        mNetworkCallback = new ConnectivityManager.NetworkCallback(FLAG_INCLUDE_LOCATION_INFO) {
             @Override
             public void onCapabilitiesChanged(@NonNull Network network, @NonNull NetworkCapabilities networkCapabilities) {
                 Log.d(TAG, "network capabilities changed");
                 super.onCapabilitiesChanged(network, networkCapabilities);
                 mNetworkCapabilities = networkCapabilities;
-                updatePhoneVolume();
+                if (ActivityCompat.checkSelfPermission(context, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+                    stopMonitoring();
+                } else {
+                    updatePhoneVolume();
+                }
             }
         };
         cm.registerNetworkCallback(request, mNetworkCallback);
@@ -55,12 +67,23 @@ public class WifiBackgroundMonitor {
                     NotificationManager notificationManager = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
                     if (notificationManager.isNotificationPolicyAccessGranted()) {
                         Log.d(TAG, "Permission granted, retrying silencing...");
-                        updatePhoneVolume();
+                        if (ActivityCompat.checkSelfPermission(context, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+                            stopMonitoring();
+                        } else {
+                            updatePhoneVolume();
+                        }
                     }
+                } else {
+                    context.startActivity(new Intent(Settings.ACTION_NOTIFICATION_POLICY_ACCESS_SETTINGS));
                 }
             }
         };
+
         context.registerReceiver(mPolicyReceiver, new IntentFilter(NotificationManager.ACTION_NOTIFICATION_POLICY_ACCESS_GRANTED_CHANGED));
+        NotificationManager notificationManager = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
+        if (!notificationManager.isNotificationPolicyAccessGranted()) {
+            context.startActivity(new Intent(Settings.ACTION_NOTIFICATION_POLICY_ACCESS_SETTINGS).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK));
+        }
     }
 
     public void stopMonitoring() {
@@ -118,18 +141,21 @@ public class WifiBackgroundMonitor {
     @RequiresPermission(Manifest.permission.ACCESS_FINE_LOCATION)
     private void updatePhoneVolume() {
         Log.d(TAG, "update phone volume method called");
-
-        WifiInfo wifiInfo = (WifiInfo) mNetworkCapabilities.getTransportInfo();
-        if (wifiInfo != null && wifiInfo.getSSID() != null) {
-            String currentSSID = wifiInfo.getSSID();
-            String TARGET_SSID = "\"Sister Location\"";
-            if (currentSSID.equals(TARGET_SSID)) {
-                Log.d(TAG, "target wifi found, currentSSID: " + currentSSID);
-                silencePhone();
-            } else {
-                Log.d(TAG, "not target wifi, currentSSID: " + currentSSID);
-                unsilencePhone();
+        if (mNetworkCapabilities.getTransportInfo() instanceof @Nullable WifiInfo wifiInfo) {
+            if (!Objects.equals(wifiInfo.getSSID(), WifiManager.UNKNOWN_SSID)) {
+                String currentSSID = wifiInfo.getSSID();
+                Log.d(TAG, "wifiInfo.getSSID(): " + currentSSID);
+                String TARGET_SSID = "\"Sister Location\"";
+                if (currentSSID.equals(TARGET_SSID)) {
+                    Log.d(TAG, "target wifi found, currentSSID: " + currentSSID);
+                    silencePhone();
+                } else {
+                    Log.d(TAG, "not target wifi, currentSSID: " + currentSSID);
+                    unsilencePhone();
+                }
             }
+        } else {
+            Log.d(TAG, "mNetworkCapabilities was not of type WifiInfo: " + mNetworkCapabilities);
         }
     }
 }

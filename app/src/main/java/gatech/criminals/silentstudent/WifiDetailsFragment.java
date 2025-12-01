@@ -1,6 +1,7 @@
 package gatech.criminals.silentstudent;
 
 import android.Manifest;
+import android.annotation.SuppressLint;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
@@ -35,7 +36,8 @@ import gatech.criminals.silentstudent.databinding.FragmentMainBinding;
  */
 public class WifiDetailsFragment extends Fragment implements PermissionsRationaleFragment.RationaleDialogListener {
     private static final String TAG = "WifiDetailsFragment";
-    public static ActivityResultLauncher<String> requestPermissionLauncher;
+    public static ActivityResultLauncher<String> requestPermissionWifiScanLauncher;
+    public static ActivityResultLauncher<String[]> requestPermissionSilentStudentLauncher;
     List<ScanResult> mScanResults;
     private FragmentMainBinding mBinding;
     private WifiManager mWifiManager;
@@ -78,12 +80,25 @@ public class WifiDetailsFragment extends Fragment implements PermissionsRational
         requireContext().registerReceiver(mWifiReceiver, new IntentFilter(WifiManager.SCAN_RESULTS_AVAILABLE_ACTION));
         Log.d(TAG, "registered broadcast receiver as mWifiReceiver");
 
-        requestPermissionLauncher = registerForActivityResult(new ActivityResultContracts.RequestPermission(), isGranted -> {
+        requestPermissionWifiScanLauncher = registerForActivityResult(new ActivityResultContracts.RequestPermission(), isGranted -> {
             if (isGranted) {
                 Log.d(TAG, "Permissions granted, attempting scan now");
                 startWifiScan();
             } else {
                 Log.d(TAG, "Permission denied by user");
+            }
+        });
+
+        requestPermissionSilentStudentLauncher = registerForActivityResult(new ActivityResultContracts.RequestMultiplePermissions(), result -> {
+            boolean notificationGranted = Boolean.TRUE.equals(result.getOrDefault(Manifest.permission.POST_NOTIFICATIONS, false));
+            boolean locationGranted = Boolean.TRUE.equals(result.getOrDefault(Manifest.permission.ACCESS_FINE_LOCATION, false));
+
+            if (notificationGranted && locationGranted) {
+                Log.d(TAG, "permissions granted, starting foreground service now");
+                Intent intent = new Intent(getContext(), WifiBackgroundMonitorService.class);
+                requireContext().startForegroundService(intent);
+            } else {
+                Log.w(TAG, "Permissions missing!");
             }
         });
     }
@@ -122,6 +137,7 @@ public class WifiDetailsFragment extends Fragment implements PermissionsRational
         getParentFragmentManager().beginTransaction().replace(R.id.main_activity_host, fragment).addToBackStack(null).commit();
     }
 
+    @SuppressLint("MissingPermission")
     public void onClickScanWifi() {
         Log.d(TAG, "starting onClickScanWifi");
         startWifiScan();
@@ -132,10 +148,9 @@ public class WifiDetailsFragment extends Fragment implements PermissionsRational
         startSilentStudent();
     }
 
-    @RequiresPermission(Manifest.permission.FOREGROUND_SERVICE_LOCATION)
     private void startSilentStudent() {
         Log.d(TAG, "starting silent student!");
-        if (checkPermissions()) {
+        if (checkNotificationPermissions()) {
             Log.d(TAG, "necessary permissions granted, starting foreground service");
             Intent intent = new Intent(getContext(), WifiBackgroundMonitorService.class);
             requireContext().startForegroundService(intent);
@@ -154,26 +169,43 @@ public class WifiDetailsFragment extends Fragment implements PermissionsRational
         }
     }
 
-    public boolean checkPermissions() {
+    public boolean checkScanPermissions() {
         if (ActivityCompat.checkSelfPermission(requireContext(), Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
             return true;
-        }
-        if (shouldShowRequestPermissionRationale(Manifest.permission.ACCESS_FINE_LOCATION)) {
+        } else if (shouldShowRequestPermissionRationale(Manifest.permission.ACCESS_FINE_LOCATION)) {
             Log.d(TAG, "Showing permission rationale dialog");
             PermissionsRationaleFragment dialog = new PermissionsRationaleFragment();
             dialog.show(getChildFragmentManager(), "PermissionsRationaleFragment");
         } else {
             Log.d(TAG, "Requesting permission for first time (or selected don't ask again)");
-            requestPermissionLauncher.launch(Manifest.permission.ACCESS_FINE_LOCATION);
+            requestPermissionWifiScanLauncher.launch(Manifest.permission.ACCESS_FINE_LOCATION);
         }
 
         return ActivityCompat.checkSelfPermission(requireContext(), Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED;
     }
 
+    public boolean checkNotificationPermissions() {
+        if (ActivityCompat.checkSelfPermission(requireContext(), Manifest.permission.POST_NOTIFICATIONS) == PackageManager.PERMISSION_GRANTED) {
+            return true;
+        } else if (shouldShowRequestPermissionRationale(Manifest.permission.POST_NOTIFICATIONS)) {
+            Log.d(TAG, "Showing permission rationale dialog");
+            PermissionsRationaleFragment dialog = new PermissionsRationaleFragment();
+            dialog.show(getChildFragmentManager(), "PermissionsRationaleFragment");
+        } else {
+            Log.d(TAG, "Requesting permission for first time (or selected don't ask again)");
+            requestPermissionSilentStudentLauncher.launch(new String[]{Manifest.permission.POST_NOTIFICATIONS, Manifest.permission.ACCESS_FINE_LOCATION});
+        }
+
+        return ActivityCompat.checkSelfPermission(requireContext(), Manifest.permission.POST_NOTIFICATIONS) == PackageManager.PERMISSION_GRANTED;
+    }
+
+
+    @RequiresPermission(Manifest.permission.ACCESS_FINE_LOCATION)
     private void startWifiScan() {
-        if (checkPermissions()) {
+        if (checkScanPermissions()) {
             if (mWifiManager.isWifiEnabled()) {
                 Log.d(TAG, "scanning wifi now");
+                //noinspection deprecation
                 if (!mWifiManager.startScan()) {
                     Log.w(TAG, "Wifi scan did not start, try again soon");
                 } else {
@@ -190,6 +222,6 @@ public class WifiDetailsFragment extends Fragment implements PermissionsRational
     @Override
     public void onDialogPositiveClick(DialogFragment dialog) {
         Log.d(TAG, "user clicked continue from rationale dialog, requesting permissions now");
-        requestPermissionLauncher.launch(Manifest.permission.ACCESS_FINE_LOCATION);
+        requestPermissionWifiScanLauncher.launch(Manifest.permission.ACCESS_FINE_LOCATION);
     }
 }
