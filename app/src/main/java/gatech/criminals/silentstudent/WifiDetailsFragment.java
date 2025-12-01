@@ -26,6 +26,7 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 import gatech.criminals.silentstudent.databinding.FragmentMainBinding;
 
@@ -64,7 +65,7 @@ public class WifiDetailsFragment extends Fragment implements PermissionsRational
                 if (ActivityCompat.checkSelfPermission(requireContext(), Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
                     Log.d(TAG, "fragment has permission, getting scan results");
                     mScanResults = mWifiManager.getScanResults();
-                    mScanResults.removeIf(result -> result.SSID.isEmpty());
+                    mScanResults.removeIf(result -> Objects.equals(Objects.requireNonNull(result.getWifiSsid()).toString(), ""));
                 } else {
                     Log.d(TAG, "fragment does not have permission!");
                 }
@@ -108,7 +109,7 @@ public class WifiDetailsFragment extends Fragment implements PermissionsRational
 
         mScanResults = new ArrayList<>();
         mWifiDetailsAdapter = new WifiDetailsAdapter(mScanResults, result -> {
-            Log.d(TAG, "Clicked on: " + result.SSID);
+            Log.d(TAG, "Clicked on: " + result.getWifiSsid());
             openDetailFragment(result);
         });
         recyclerView.setAdapter(mWifiDetailsAdapter);
