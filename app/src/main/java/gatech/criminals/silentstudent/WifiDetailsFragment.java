@@ -47,7 +47,6 @@ public class WifiDetailsFragment extends Fragment implements PermissionsRational
      * fragment (e.g. upon screen orientation changes).
      */
     public WifiDetailsFragment() {
-        super(R.layout.fragment_main);
     }
 
     @Override
@@ -65,6 +64,7 @@ public class WifiDetailsFragment extends Fragment implements PermissionsRational
                 if (ActivityCompat.checkSelfPermission(requireContext(), Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
                     Log.d(TAG, "fragment has permission, getting scan results");
                     mScanResults = mWifiManager.getScanResults();
+                    mScanResults.removeIf(result -> result.SSID.isEmpty());
                 } else {
                     Log.d(TAG, "fragment does not have permission!");
                 }
