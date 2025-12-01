@@ -37,7 +37,7 @@ public class PermissionsRationaleFragment extends DialogFragment {
     public Dialog onCreateDialog(@Nullable Bundle savedInstanceState) {
         return new AlertDialog.Builder(requireContext()).setMessage(getString(R.string.permission_rationale)).setPositiveButton(getString(R.string.continue_dialog), (dialog, which) -> {
             if (listener != null) {
-                listener.onDialogPositiveClick(PermissionsRationaleFragment.this);
+                listener.onDialogPositiveClick();
             } else {
                 Log.e(TAG, "listener was null! not possible if onAttach is correct");
             }
@@ -51,6 +51,6 @@ public class PermissionsRationaleFragment extends DialogFragment {
     }
 
     public interface RationaleDialogListener {
-        void onDialogPositiveClick(DialogFragment dialog);
+        void onDialogPositiveClick();
     }
 }

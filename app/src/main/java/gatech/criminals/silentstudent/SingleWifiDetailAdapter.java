@@ -76,8 +76,8 @@ public class SingleWifiDetailAdapter extends RecyclerView.Adapter<SingleWifiDeta
     }
 
     public static class ViewHolder extends RecyclerView.ViewHolder {
-        public TextView mPropertyTextView;
-        public TextView mValueTextView;
+        public final TextView mPropertyTextView;
+        public final TextView mValueTextView;
 
         public ViewHolder(WifiDetailsItemLayoutBinding binding) {
             super(binding.getRoot());

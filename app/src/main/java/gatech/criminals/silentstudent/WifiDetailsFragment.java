@@ -20,7 +20,6 @@ import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
 import androidx.annotation.RequiresPermission;
 import androidx.core.app.ActivityCompat;
-import androidx.fragment.app.DialogFragment;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -220,7 +219,7 @@ public class WifiDetailsFragment extends Fragment implements PermissionsRational
     }
 
     @Override
-    public void onDialogPositiveClick(DialogFragment dialog) {
+    public void onDialogPositiveClick() {
         Log.d(TAG, "user clicked continue from rationale dialog, requesting permissions now");
         requestPermissionWifiScanLauncher.launch(Manifest.permission.ACCESS_FINE_LOCATION);
     }

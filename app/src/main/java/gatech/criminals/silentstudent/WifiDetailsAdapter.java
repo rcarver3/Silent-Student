@@ -44,7 +44,8 @@ public class WifiDetailsAdapter extends RecyclerView.Adapter<WifiDetailsAdapter.
 
         ScanResult currentScanResult = mWifiScanResults.get(position);
         viewHolder.mSsidTextView.setText(Objects.requireNonNull(currentScanResult.getWifiSsid()).toString().replaceAll("\"", ""));
-        viewHolder.mLevelTextView.setText(currentScanResult.level + " dBm");
+        viewHolder.mLevelTextView.setText(String.valueOf(currentScanResult.level));
+        viewHolder.mLevelTextView.append(" dBm");
 
         viewHolder.itemView.setOnClickListener(v -> {
             if (mListener != null) {
@@ -76,8 +77,8 @@ public class WifiDetailsAdapter extends RecyclerView.Adapter<WifiDetailsAdapter.
     }
 
     public static class ViewHolder extends RecyclerView.ViewHolder {
-        public TextView mSsidTextView;
-        public TextView mLevelTextView;
+        public final TextView mSsidTextView;
+        public final TextView mLevelTextView;
 
         public ViewHolder(WifiDetailsItemLayoutBinding binding) {
             super(binding.getRoot());

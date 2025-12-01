@@ -36,7 +36,7 @@ public class SingleWifiDetailFragment extends Fragment {
 
         if (getArguments() != null) {
             Log.d(TAG, "arguments are not null.\nScan Result: " + mResult);
-            mResult = getArguments().getParcelable(ARG_RESULT);
+            mResult = getArguments().getParcelable(ARG_RESULT, ScanResult.class);
         }
         return mBinding.getRoot();
     }
@@ -61,7 +61,7 @@ public class SingleWifiDetailFragment extends Fragment {
     }
 
     private void onClickAddToKnownWifi() {
-        Log.d(TAG, "onClickAddToKnownWifi for ssid: " + mResult.SSID);
+        Log.d(TAG, "onClickAddToKnownWifi for ssid: " + mResult.getWifiSsid());
         getParentFragmentManager().popBackStack();
         // TODO: add to known wifi list
     }
