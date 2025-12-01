@@ -26,7 +26,6 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
 
 import gatech.criminals.silentstudent.databinding.FragmentMainBinding;
 
@@ -65,7 +64,6 @@ public class WifiDetailsFragment extends Fragment implements PermissionsRational
                 if (ActivityCompat.checkSelfPermission(requireContext(), Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
                     Log.d(TAG, "fragment has permission, getting scan results");
                     mScanResults = mWifiManager.getScanResults();
-                    mScanResults.removeIf(result -> Objects.equals(Objects.requireNonNull(result.getWifiSsid()).toString(), ""));
                 } else {
                     Log.d(TAG, "fragment does not have permission!");
                 }
@@ -101,6 +99,7 @@ public class WifiDetailsFragment extends Fragment implements PermissionsRational
     public void onViewCreated(@NonNull View view, Bundle savedInstanceState) {
         Log.d(TAG, "onViewCreated start.\nView: " + view);
         mBinding.scanWifiButton.setOnClickListener(v -> onClickScanWifi());
+        mBinding.enableButton.setOnClickListener(v -> onClickEnableSilentStudent());
 
         // Set the adapter
         Log.d(TAG, "view is RecyclerView, starting creation");
@@ -128,6 +127,23 @@ public class WifiDetailsFragment extends Fragment implements PermissionsRational
         startWifiScan();
     }
 
+    public void onClickEnableSilentStudent() {
+        Log.d(TAG, "starting onClickEnableSilentStudent");
+        startSilentStudent();
+    }
+
+    @RequiresPermission(Manifest.permission.FOREGROUND_SERVICE_LOCATION)
+    private void startSilentStudent() {
+        Log.d(TAG, "starting silent student!");
+        if (checkPermissions()) {
+            Log.d(TAG, "necessary permissions granted, starting foreground service");
+            Intent intent = new Intent(getContext(), WifiBackgroundMonitorService.class);
+            requireContext().startForegroundService(intent);
+        } else {
+            Log.d(TAG, "insufficient permissions!");
+        }
+    }
+
     @Override
     public void onDestroy() {
         super.onDestroy();
@@ -138,8 +154,24 @@ public class WifiDetailsFragment extends Fragment implements PermissionsRational
         }
     }
 
-    private void startWifiScan() {
+    public boolean checkPermissions() {
         if (ActivityCompat.checkSelfPermission(requireContext(), Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
+            return true;
+        }
+        if (shouldShowRequestPermissionRationale(Manifest.permission.ACCESS_FINE_LOCATION)) {
+            Log.d(TAG, "Showing permission rationale dialog");
+            PermissionsRationaleFragment dialog = new PermissionsRationaleFragment();
+            dialog.show(getChildFragmentManager(), "PermissionsRationaleFragment");
+        } else {
+            Log.d(TAG, "Requesting permission for first time (or selected don't ask again)");
+            requestPermissionLauncher.launch(Manifest.permission.ACCESS_FINE_LOCATION);
+        }
+
+        return ActivityCompat.checkSelfPermission(requireContext(), Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED;
+    }
+
+    private void startWifiScan() {
+        if (checkPermissions()) {
             if (mWifiManager.isWifiEnabled()) {
                 Log.d(TAG, "scanning wifi now");
                 if (!mWifiManager.startScan()) {
@@ -150,13 +182,8 @@ public class WifiDetailsFragment extends Fragment implements PermissionsRational
             } else {
                 Log.d(TAG, "wifi is not enabled!! Start it now!!");
             }
-        } else if (shouldShowRequestPermissionRationale(Manifest.permission.ACCESS_FINE_LOCATION)) {
-            Log.d(TAG, "Showing permission rationale dialog");
-            PermissionsRationaleFragment dialog = new PermissionsRationaleFragment();
-            dialog.show(getChildFragmentManager(), "PermissionsRationaleFragment");
         } else {
-            Log.d(TAG, "Requesting permission for first time (or selected don't ask again_)");
-            requestPermissionLauncher.launch(Manifest.permission.ACCESS_FINE_LOCATION);
+            Log.d(TAG, "insufficient permissions");
         }
     }
 

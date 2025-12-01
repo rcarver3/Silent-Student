@@ -1,26 +1,21 @@
 package gatech.criminals.silentstudent;
 
-import static androidx.core.content.ContentProviderCompat.requireContext;
-import static androidx.core.content.ContextCompat.getSystemService;
-
-import android.content.Context;
 import android.net.wifi.ScanResult;
-import android.net.wifi.WifiManager;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
-import androidx.core.content.ContextCompat;
 import androidx.recyclerview.widget.RecyclerView;
 
 import java.util.List;
+import java.util.Objects;
 
 import gatech.criminals.silentstudent.databinding.WifiDetailsItemLayoutBinding;
 
 /**
- * {@link RecyclerView.Adapter} that can display a {@link ScanResult} via {@link ScanResult#getWifiSsid()}
+ * {@link RecyclerView.Adapter<WifiDetailsAdapter.ViewHolder>} that can display a {@link ScanResult} via {@link ScanResult#getWifiSsid()}
  * and its {@link ScanResult#BSSID}.
  */
 public class WifiDetailsAdapter extends RecyclerView.Adapter<WifiDetailsAdapter.ViewHolder> {
@@ -36,22 +31,19 @@ public class WifiDetailsAdapter extends RecyclerView.Adapter<WifiDetailsAdapter.
     @NonNull
     @Override
     public ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        Log.d(TAG, "onCreateViewHolder start");
         WifiDetailsItemLayoutBinding binding = WifiDetailsItemLayoutBinding.inflate(LayoutInflater.from(parent.getContext()), parent, false);
         return new ViewHolder(binding);
     }
 
     @Override
     public void onBindViewHolder(@NonNull ViewHolder viewHolder, int position) {
-        Log.d(TAG, "onBindViewHolder start");
         if (mWifiScanResults.isEmpty()) {
             Log.d(TAG, "mWifiScanResults is empty");
             return;
         }
 
-        Log.d(TAG, "setting ssid and rssi at position: " + position);
         ScanResult currentScanResult = mWifiScanResults.get(position);
-        viewHolder.mSsidTextView.setText(currentScanResult.SSID);
+        viewHolder.mSsidTextView.setText(Objects.requireNonNull(currentScanResult.getWifiSsid()).toString().replaceAll("\"", ""));
         viewHolder.mLevelTextView.setText(currentScanResult.level + " dBm");
 
         viewHolder.itemView.setOnClickListener(v -> {
@@ -68,6 +60,7 @@ public class WifiDetailsAdapter extends RecyclerView.Adapter<WifiDetailsAdapter.
         notifyItemRangeRemoved(0, itemCount);
 
         if ((newScan != null) && (!newScan.isEmpty())) {
+            newScan.removeIf(result -> Objects.equals(Objects.requireNonNull(result.getWifiSsid()).toString(), ""));
             mWifiScanResults.addAll(newScan);
             notifyItemRangeInserted(0, mWifiScanResults.size());
         }
@@ -76,6 +69,10 @@ public class WifiDetailsAdapter extends RecyclerView.Adapter<WifiDetailsAdapter.
     @Override
     public int getItemCount() {
         return mWifiScanResults.size();
+    }
+
+    public interface OnWifiItemClickListener {
+        void onWifiItemClick(ScanResult scanResult);
     }
 
     public static class ViewHolder extends RecyclerView.ViewHolder {
@@ -88,9 +85,5 @@ public class WifiDetailsAdapter extends RecyclerView.Adapter<WifiDetailsAdapter.
             mSsidTextView = binding.propertyItem;
             mLevelTextView = binding.valueItem;
         }
-    }
-
-    public interface OnWifiItemClickListener {
-        void onWifiItemClick(ScanResult scanResult);
     }
 }
