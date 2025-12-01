@@ -14,23 +14,25 @@ import java.util.List;
 import gatech.criminals.silentstudent.databinding.WifiDetailsItemLayoutBinding;
 
 /**
- * {@link RecyclerView.Adapter} that can display a {@link ScanResult} via its {@link ScanResult#SSID}
+ * {@link RecyclerView.Adapter} that can display a {@link ScanResult} via {@link ScanResult#getWifiSsid()}
  * and its {@link ScanResult#BSSID}.
  */
 public class WifiDetailsAdapter extends RecyclerView.Adapter<WifiDetailsAdapter.ViewHolder> {
     private static final String TAG = "WifiDetailsAdapter";
     private final List<ScanResult> mWifiScanResults;
+    private final OnWifiItemClickListener mListener;
 
-    public WifiDetailsAdapter(List<ScanResult> items) {
+    public WifiDetailsAdapter(List<ScanResult> items, OnWifiItemClickListener listener) {
         mWifiScanResults = items;
+        mListener = listener;
     }
 
     @NonNull
     @Override
     public ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         Log.d(TAG, "onCreateViewHolder start");
-        WifiDetailsItemLayoutBinding mBinding = WifiDetailsItemLayoutBinding.inflate(LayoutInflater.from(parent.getContext()), parent, false);
-        return new ViewHolder(mBinding);
+        WifiDetailsItemLayoutBinding binding = WifiDetailsItemLayoutBinding.inflate(LayoutInflater.from(parent.getContext()), parent, false);
+        return new ViewHolder(binding);
     }
 
     @Override
@@ -45,6 +47,12 @@ public class WifiDetailsAdapter extends RecyclerView.Adapter<WifiDetailsAdapter.
         ScanResult currentScanResult = mWifiScanResults.get(position);
         viewHolder.mSsidTextView.setText(currentScanResult.SSID);
         viewHolder.mBssidTextView.setText(currentScanResult.BSSID);
+
+        viewHolder.itemView.setOnClickListener(v -> {
+            if (mListener != null) {
+                mListener.onWifiItemClick(currentScanResult);
+            }
+        });
     }
 
     public void updateData(List<ScanResult> newScan) {
@@ -72,8 +80,12 @@ public class WifiDetailsAdapter extends RecyclerView.Adapter<WifiDetailsAdapter.
         public ViewHolder(WifiDetailsItemLayoutBinding binding) {
             super(binding.getRoot());
 
-            mSsidTextView = binding.ssidWifiItem;
-            mBssidTextView = binding.bssidWifiItem;
+            mSsidTextView = binding.propertyItem;
+            mBssidTextView = binding.valueItem;
         }
+    }
+
+    public interface OnWifiItemClickListener {
+        void onWifiItemClick(ScanResult scanResult);
     }
 }

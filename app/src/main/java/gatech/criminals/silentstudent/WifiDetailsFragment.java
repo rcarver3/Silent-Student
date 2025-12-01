@@ -107,11 +107,19 @@ public class WifiDetailsFragment extends Fragment implements PermissionsRational
         RecyclerView recyclerView = mBinding.wifiListRecyclerView;
 
         mScanResults = new ArrayList<>();
-        mWifiDetailsAdapter = new WifiDetailsAdapter(mScanResults);
+        mWifiDetailsAdapter = new WifiDetailsAdapter(mScanResults, result -> {
+            Log.d(TAG, "Clicked on: " + result.SSID);
+            openDetailFragment(result);
+        });
         recyclerView.setAdapter(mWifiDetailsAdapter);
 
         recyclerView.setLayoutManager(new LinearLayoutManager(context));
         recyclerView.setHasFixedSize(true);
+    }
+
+    private void openDetailFragment(ScanResult result) {
+        SingleWifiDetailFragment fragment = SingleWifiDetailFragment.newInstance(result);
+        getParentFragmentManager().beginTransaction().replace(R.id.main_activity_host, fragment).addToBackStack(null).commit();
     }
 
     public void onClickScanWifi() {

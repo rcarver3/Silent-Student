@@ -7,4 +7,7 @@
     <string name="SSID_text_heading">SSID</string>
     <string name="BSSID_text_heading">BSSID</string>
     <string name="scan_wifi_button_label">Scan WiFi</string>
+    <string name="property_heading">Property</string>
+    <string name="value_heading">Value</string>
+    <string name="add_to_known_wifi_list">Add to Known WiFi List</string>
 </resources>
