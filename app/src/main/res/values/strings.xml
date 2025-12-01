@@ -5,7 +5,7 @@
     <string name="deny_permissions">Skip for now</string>
     <string name="continue_dialog">Continue</string>
     <string name="SSID_text_heading">SSID</string>
-    <string name="BSSID_text_heading">BSSID</string>
+    <string name="RSSI_heading">RSSI</string>
     <string name="scan_wifi_button_label">Scan WiFi</string>
     <string name="property_heading">Property</string>
     <string name="value_heading">Value</string>

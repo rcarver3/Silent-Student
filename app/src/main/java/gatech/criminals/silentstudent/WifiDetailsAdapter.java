@@ -1,12 +1,18 @@
 package gatech.criminals.silentstudent;
 
+import static androidx.core.content.ContentProviderCompat.requireContext;
+import static androidx.core.content.ContextCompat.getSystemService;
+
+import android.content.Context;
 import android.net.wifi.ScanResult;
+import android.net.wifi.WifiManager;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
+import androidx.core.content.ContextCompat;
 import androidx.recyclerview.widget.RecyclerView;
 
 import java.util.List;
@@ -43,10 +49,10 @@ public class WifiDetailsAdapter extends RecyclerView.Adapter<WifiDetailsAdapter.
             return;
         }
 
-        Log.d(TAG, "setting ssid and bssid at position: " + position);
+        Log.d(TAG, "setting ssid and rssi at position: " + position);
         ScanResult currentScanResult = mWifiScanResults.get(position);
         viewHolder.mSsidTextView.setText(currentScanResult.SSID);
-        viewHolder.mBssidTextView.setText(currentScanResult.BSSID);
+        viewHolder.mLevelTextView.setText(currentScanResult.level + " dBm");
 
         viewHolder.itemView.setOnClickListener(v -> {
             if (mListener != null) {
@@ -74,14 +80,13 @@ public class WifiDetailsAdapter extends RecyclerView.Adapter<WifiDetailsAdapter.
 
     public static class ViewHolder extends RecyclerView.ViewHolder {
         public TextView mSsidTextView;
-        public TextView mBssidTextView;
-        // TODO: maybe signal strength indicator is more interesting?
+        public TextView mLevelTextView;
 
         public ViewHolder(WifiDetailsItemLayoutBinding binding) {
             super(binding.getRoot());
 
             mSsidTextView = binding.propertyItem;
-            mBssidTextView = binding.valueItem;
+            mLevelTextView = binding.valueItem;
         }
     }
 
