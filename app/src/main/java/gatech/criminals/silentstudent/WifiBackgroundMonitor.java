@@ -3,6 +3,7 @@ package gatech.criminals.silentstudent;
 import static android.net.ConnectivityManager.NetworkCallback.FLAG_INCLUDE_LOCATION_INFO;
 
 import android.Manifest;
+import android.app.Notification;
 import android.app.NotificationManager;
 import android.content.BroadcastReceiver;
 import android.content.Context;
@@ -23,11 +24,13 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.annotation.RequiresPermission;
 import androidx.core.app.ActivityCompat;
+import androidx.core.app.NotificationCompat;
 
 import java.util.Objects;
 
 public class WifiBackgroundMonitor {
     private static final String TAG = "WifiBackgroundMonitor";
+    private static final String CHANNEL_ID = "WifiBackgroundMonitorChannel";
     private final Context context;
     private ConnectivityManager.NetworkCallback mNetworkCallback;
     private NetworkCapabilities mNetworkCapabilities;
@@ -116,6 +119,8 @@ public class WifiBackgroundMonitor {
 
         if (notificationManager.isNotificationPolicyAccessGranted()) {
             Log.d(TAG, "notification policy granted");
+            Notification notification = new NotificationCompat.Builder(context, CHANNEL_ID).setContentTitle("Phone Silenced!").setContentText("Silent Student has silenced your phone.").setSmallIcon(android.R.drawable.ic_dialog_info).build();
+            notificationManager.notify(1, notification);
             AudioManager audioManager = (AudioManager) context.getSystemService(Context.AUDIO_SERVICE);
             audioManager.setRingerMode(AudioManager.RINGER_MODE_SILENT);
         } else {

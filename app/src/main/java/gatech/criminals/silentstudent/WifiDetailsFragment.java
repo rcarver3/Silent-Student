@@ -65,6 +65,7 @@ public class WifiDetailsFragment extends Fragment implements PermissionsRational
                 if (ActivityCompat.checkSelfPermission(requireContext(), Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
                     Log.d(TAG, "fragment has permission, getting scan results");
                     mScanResults = mWifiManager.getScanResults();
+                    mBinding.scanWifiButton.setText("Scan Wifi");
                 } else {
                     Log.d(TAG, "fragment does not have permission!");
                 }
@@ -139,11 +140,14 @@ public class WifiDetailsFragment extends Fragment implements PermissionsRational
     @SuppressLint("MissingPermission")
     public void onClickScanWifi() {
         Log.d(TAG, "starting onClickScanWifi");
+        mBinding.scanWifiButton.setText("Scanning...");
         startWifiScan();
     }
 
     public void onClickEnableSilentStudent() {
         Log.d(TAG, "starting onClickEnableSilentStudent");
+        mBinding.enableButton.setText("Monitoring...");
+        mBinding.enableButton.setEnabled(false);
         startSilentStudent();
     }
 
