@@ -9,13 +9,16 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.google.android.material.listitem.ListItemViewHolder;
+
 import java.util.List;
 import java.util.Objects;
 
-import gatech.criminals.silentstudent.databinding.WifiDetailsItemLayoutBinding;
+import gatech.criminals.silentstudent.databinding.WifiScanResultItemBinding;
 
 /**
- * {@link RecyclerView.Adapter<WifiDetailsAdapter.ViewHolder>} that can display a {@link ScanResult} via {@link ScanResult#getWifiSsid()}
+ * {@link RecyclerView.Adapter<WifiDetailsAdapter.ViewHolder>} that can display a
+ * {@link ScanResult} via {@link ScanResult#getWifiSsid()}
  * and its {@link ScanResult#BSSID}.
  */
 public class WifiDetailsAdapter extends RecyclerView.Adapter<WifiDetailsAdapter.ViewHolder> {
@@ -31,7 +34,9 @@ public class WifiDetailsAdapter extends RecyclerView.Adapter<WifiDetailsAdapter.
     @NonNull
     @Override
     public ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        WifiDetailsItemLayoutBinding binding = WifiDetailsItemLayoutBinding.inflate(LayoutInflater.from(parent.getContext()), parent, false);
+        WifiScanResultItemBinding binding =
+                WifiScanResultItemBinding.inflate(LayoutInflater.from(parent.getContext()),
+                        parent, false);
         return new ViewHolder(binding);
     }
 
@@ -41,6 +46,8 @@ public class WifiDetailsAdapter extends RecyclerView.Adapter<WifiDetailsAdapter.
             Log.d(TAG, "mWifiScanResults is empty");
             return;
         }
+
+        viewHolder.bind();
 
         ScanResult currentScanResult = mWifiScanResults.get(position);
         viewHolder.mSsidTextView.setText(Objects.requireNonNull(currentScanResult.getWifiSsid()).toString().replaceAll("\"", ""));
@@ -76,15 +83,15 @@ public class WifiDetailsAdapter extends RecyclerView.Adapter<WifiDetailsAdapter.
         void onWifiItemClick(ScanResult scanResult);
     }
 
-    public static class ViewHolder extends RecyclerView.ViewHolder {
+    public static class ViewHolder extends ListItemViewHolder {
         public final TextView mSsidTextView;
         public final TextView mLevelTextView;
 
-        public ViewHolder(WifiDetailsItemLayoutBinding binding) {
+        public ViewHolder(WifiScanResultItemBinding binding) {
             super(binding.getRoot());
 
-            mSsidTextView = binding.propertyItem;
-            mLevelTextView = binding.valueItem;
+            mSsidTextView = binding.scanResultItemDetailsSsid;
+            mLevelTextView = binding.scanResultItemDetailsInfo;
         }
     }
 }

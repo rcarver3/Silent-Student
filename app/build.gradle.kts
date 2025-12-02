@@ -10,7 +10,7 @@ android {
 
     defaultConfig {
         applicationId = "gatech.criminals.silentstudent"
-        minSdk = 33
+        minSdk = 34
         targetSdk = 36
         versionCode = 1
         versionName = "1.0"
@@ -48,6 +48,7 @@ dependencies {
     implementation(libs.legacy.support.v4)
     implementation(libs.lifecycle.livedata.ktx)
     implementation(libs.lifecycle.viewmodel.ktx)
+    implementation(libs.google.material)
     testImplementation(libs.junit)
     androidTestImplementation(libs.ext.junit)
     androidTestImplementation(libs.espresso.core)

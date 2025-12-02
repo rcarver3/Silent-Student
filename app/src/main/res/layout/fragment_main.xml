@@ -6,7 +6,6 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:layout_gravity="center_horizontal"
-    android:layout_marginHorizontal="24dp"
     app:layout_constraintBottom_toBottomOf="parent"
     app:layout_constraintEnd_toEndOf="parent"
     app:layout_constraintStart_toStartOf="parent"
@@ -18,7 +17,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="@string/app_name"
-        android:textAppearance="@style/TextAppearance.AppCompat.Display2"
+        android:textAppearance="?attr/textAppearanceDisplayLarge"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
@@ -28,51 +27,27 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_gravity="center"
-        android:layout_marginTop="24dp"
         android:orientation="horizontal"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/silent_student_title">
-
-        <TextView
-            android:id="@+id/ssid_wifi_item_heading"
-            android:layout_width="0dp"
-            android:layout_height="match_parent"
-            android:layout_weight="1"
-            android:gravity="left"
-            android:paddingStart="@dimen/text_margin"
-            android:text="@string/SSID_text_heading"
-            android:textAppearance="@style/TextAppearance.AppCompat.Display1" />
-
-        <TextView
-            android:id="@+id/bssid_wifi_item_heading"
-            android:layout_width="0dp"
-            android:layout_height="match_parent"
-            android:layout_weight="1"
-            android:gravity="right"
-            android:paddingEnd="@dimen/text_margin"
-            android:text="@string/RSSI_heading"
-            android:textAppearance="@style/TextAppearance.AppCompat.Display1" />
-    </LinearLayout>
+        app:layout_constraintTop_toBottomOf="@id/silent_student_title"/>
 
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/wifi_list_recycler_view"
         android:layout_width="0dp"
         android:layout_height="0dp"
-        android:layout_marginBottom="@dimen/text_margin"
         app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
+        android:paddingVertical="8dp"
         app:layout_constraintBottom_toTopOf="@+id/scan_wifi_button"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/wifi_details_item_heading"
-        tools:listitem="@layout/wifi_details_item_layout" />
+        tools:listitem="@layout/wifi_scan_result_item" />
 
-    <Button
+    <com.google.android.material.button.MaterialButton
         android:id="@+id/scan_wifi_button"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_marginStart="16dp"
-        android:layout_marginEnd="16dp"
         android:text="@string/scan_wifi_button_label"
         app:layout_constraintBottom_toTopOf="@id/enable_button"
         app:layout_constraintEnd_toEndOf="parent"
@@ -85,9 +60,6 @@
         android:id="@+id/enable_button"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_marginStart="16dp"
-        android:layout_marginEnd="16dp"
-        android:layout_marginBottom="40dp"
         android:text="@string/enable_button_text"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"

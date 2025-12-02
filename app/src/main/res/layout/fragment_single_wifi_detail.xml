@@ -6,7 +6,6 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:layout_gravity="center_horizontal"
-    android:layout_marginHorizontal="24dp"
     app:layout_constraintBottom_toBottomOf="parent"
     app:layout_constraintEnd_toEndOf="parent"
     app:layout_constraintStart_toStartOf="parent"
@@ -17,63 +16,29 @@
         android:id="@+id/ssid_title"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:textAppearance="@style/TextAppearance.AppCompat.Display2"
+        android:textAppearance="?attr/textAppearanceDisplayLarge"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         tools:text="Item SSID" />
 
-    <LinearLayout
-        android:id="@+id/single_wifi_detail_heading"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_gravity="center"
-        android:layout_marginTop="24dp"
-        android:orientation="horizontal"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/ssid_title">
-
-        <TextView
-            android:id="@+id/property_heading"
-            android:layout_width="0dp"
-            android:layout_height="match_parent"
-            android:layout_weight="1"
-            android:gravity="left"
-            android:paddingStart="@dimen/text_margin"
-            android:text="@string/property_heading"
-            android:textAppearance="@style/TextAppearance.AppCompat.Display1" />
-
-        <TextView
-            android:id="@+id/value_heading"
-            android:layout_width="0dp"
-            android:layout_height="match_parent"
-            android:layout_weight="1"
-            android:gravity="right"
-            android:paddingEnd="@dimen/text_margin"
-            android:text="@string/value_heading"
-            android:textAppearance="@style/TextAppearance.AppCompat.Display1" />
-    </LinearLayout>
-
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/property_list"
         android:layout_width="0dp"
         android:layout_height="0dp"
-        android:layout_marginBottom="@dimen/text_margin"
+        android:paddingVertical="8dp"
+        android:paddingHorizontal="16dp"
         app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
         app:layout_constraintBottom_toTopOf="@+id/add_to_known_wifi_list"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/single_wifi_detail_heading"
+        app:layout_constraintTop_toBottomOf="@id/ssid_title"
         tools:listitem="@layout/wifi_details_item_layout" />
 
-    <Button
+    <com.google.android.material.button.MaterialButton
         android:id="@+id/add_to_known_wifi_list"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_marginStart="16dp"
-        android:layout_marginEnd="16dp"
-        android:layout_marginBottom="40dp"
         android:text="@string/add_to_known_wifi_list"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
